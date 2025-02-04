@@ -9,11 +9,12 @@ interface TaskListProps {
   onEditTask: (task: Task) => void
   onDeleteTask: (id: string) => void
   onUpdateStatus: (task: Task) => void
+  columnColor: string
 }
 
-export const TaskList: React.FC<TaskListProps> = ({ tasks, onEditTask, onDeleteTask, onUpdateStatus }) => {
+export const TaskList: React.FC<TaskListProps> = ({ tasks, onEditTask, onDeleteTask, onUpdateStatus, columnColor }) => {
   return (
-    <ul className="space-y-2">
+    <div className="space-y-2">
       {tasks.map((task) => (
         <TaskItem
           key={task.id}
@@ -21,9 +22,10 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks, onEditTask, onDeleteT
           onEdit={onEditTask}
           onDelete={onDeleteTask}
           onUpdateStatus={onUpdateStatus}
+          columnColor={columnColor}
         />
       ))}
-    </ul>
+    </div>
   )
 }
 

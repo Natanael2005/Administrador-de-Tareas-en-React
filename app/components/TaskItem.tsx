@@ -8,40 +8,46 @@ interface TaskItemProps {
   onEdit: (task: Task) => void
   onDelete: (id: string) => void
   onUpdateStatus: (task: Task) => void
+  columnColor: string
 }
 
-export const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit, onDelete, onUpdateStatus }) => {
+export const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit, onDelete, onUpdateStatus, columnColor }) => {
+  const getNextStatus = (currentStatus: string): Task["status"] => {
+    const statusFlow = {
+      pending: "in-progress",
+      "in-progress": "completed",
+      completed: "pending",
+    } as const
+    return statusFlow[currentStatus as keyof typeof statusFlow]
+  }
+
   return (
-    <li className="bg-white shadow-md rounded-lg p-4 mb-4 flex flex-col items-center space-y-3 transition-all duration-300 ease-in-out hover:shadow-lg">
-      <div className="w-full text-center">
-        <h3
-          className={`font-semibold text-lg ${task.status === "completed" ? "line-through text-gray-500" : "text-gray-800"}`}
-        >
-          {task.name}
-        </h3>
-        <p className="text-sm text-gray-600">{task.description}</p>
-      </div>
-      <div className="flex flex-wrap justify-center gap-2 w-full">
-        <button
-          onClick={() => onUpdateStatus({ ...task, status: task.status === "pending" ? "completed" : "pending" })}
-          className={`px-3 py-1 rounded-md ${task.status === "pending" ? "bg-green-500 hover:bg-green-600" : "bg-yellow-500 hover:bg-yellow-600"} text-white font-medium text-sm transition duration-300 ease-in-out`}
-        >
-          {task.status === "pending" ? "Completar" : "Reabrir"}
+    <div className="bg-white rounded-lg shadow p-4 space-y-3">
+      <div className="flex justify-between items-start">
+        <h3 className="font-medium text-gray-900">{task.name}</h3>
+        <button onClick={() => onDelete(task.id)} className="text-gray-400 hover:text-gray-600">
+          ×
         </button>
-        <button
-          onClick={() => onEdit(task)}
-          className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white font-medium text-sm rounded-md transition duration-300 ease-in-out"
-        >
+      </div>
+
+      {task.description && <p className="text-sm text-gray-600">{task.description}</p>}
+
+      <div className="flex justify-between items-center pt-2">
+        <button onClick={() => onEdit(task)} className="text-sm text-gray-600 hover:text-gray-900">
           Editar
         </button>
         <button
-          onClick={() => onDelete(task.id)}
-          className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white font-medium text-sm rounded-md transition duration-300 ease-in-out"
+          onClick={() => onUpdateStatus({ ...task, status: getNextStatus(task.status) })}
+          className={`text-sm px-3 py-1 rounded-full
+            ${columnColor === "gray" ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-200" : ""}
+            ${columnColor === "yellow" ? "bg-green-100 text-green-700 hover:bg-green-200" : ""}
+            ${columnColor === "green" ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : ""}
+          `}
         >
-          Eliminar
+          {task.status === "pending" ? "Iniciar" : task.status === "in-progress" ? "Completar" : "Reiniciar"}
         </button>
       </div>
-    </li>
+    </div>
   )
 }
 
